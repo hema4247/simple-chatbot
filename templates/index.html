@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Chatbot</title>
+    <style>
+        /* Global reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            color: #333;
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* Welcome Section */
+        #welcome-section {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            color: #004080;
+            font-weight: bold;
+        }
+
+        /* Chat Container */
+        #chat-container {
+            background: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            height: 600px;
+            transition: transform 0.2s ease;
+        }
+
+        #chat-container:hover {
+            transform: scale(1.03);
+        }
+
+        /* Chatbox Style */
+        #chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+            transition: background 0.3s ease;
+        }
+
+        #chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #chat-box::-webkit-scrollbar-thumb {
+            background: #007BFF;
+            border-radius: 4px;
+        }
+
+        /* Input field */
+        #user-input {
+            padding: 10px;
+            border: 1px solid #007BFF;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s ease;
+        }
+
+        #user-input:focus {
+            border-color: #0056b3;
+            outline: none;
+        }
+
+        /* Send Button */
+        #send-btn {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+        }
+
+        #send-btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        .message {
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Section -->
+    <div id="welcome-section">
+        Welcome to Chatbot! 🤖<br>
+        How can I assist you today? 👇
+    </div>
+
+    <!-- Chatbot Interface -->
+    <div id="chat-container">
+        <div id="chat-box"></div>
+        <div>
+            <input id="user-input" type="text" placeholder="Type your message here..." />
+            <button id="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+
+        // Function to add messages to the UI
+        function appendMessage(sender, message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+        }
+
+        // Send user message and fetch response
+        async function sendMessage() {
+            const userText = userInput.value.trim();
+            if (userText === "") return;
+
+            appendMessage("You", userText);
+
+            const response = await fetch("/get_response", {
+                method: "POST",
+                body: new URLSearchParams({ user_input: userText }),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            });
+
+            const responseData = await response.json();
+            appendMessage("Bot", responseData.response);
+
+            userInput.value = "";
+        }
+
+        // Allow Enter to send messages
+        userInput.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
