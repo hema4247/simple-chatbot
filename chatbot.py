@@ -10,8 +10,7 @@ from sklearn.metrics import accuracy_score
 # Ensure necessary NLTK resources are downloaded
 nltk.download('punkt')
 # Load intents from the JSON file
-file_path = r'intents.json'  
-with open(file_path, 'r') as file:
+with open(r'D:\nlp\intents.json', 'r') as file:
     intents = json.load(file)
 # Prepare the data
 data = []
